@@ -24,15 +24,65 @@ var step = function() {
 };
 
 var update = function() {
+  player.update();
+  computer.update(ball);
   ball.update(player.paddle, computer.paddle);
 };
+
+Player.prototype.update = function() {
+  for (var key in keysDown) {
+    var value = Number(key);
+
+    if (value == 37) { // left arrow
+      this.paddle.move(-4, 0);
+    } else if (value == 39) { // right arrow
+      this.paddle.move(4, 0);
+    } else {
+      this.paddle.move(0, 0);
+    }
+  }
+}
+
+Computer.prototype.update = function(ball) {
+  var x_pos = ball.x;
+  var diff = -( (this.paddle.x + (this.paddle.width / 2) ) - x_pos);
+  if (diff < 0  &&  diff < -4) { // max speed left
+    diff = -4;
+  } else if (diff > 0 && diff > 4) { // max speed right
+    diff = 4;
+  }
+
+  this.paddle.move(diff, 0);
+
+  if (this.paddle.x < 0) {
+    this.paddle.x = 0;
+  } else if (this.paddle.x + this.paddle.width > 400) {
+    this.paddle.x = 400 - this.paddle.width;
+  }
+}
+
+Paddle.prototype.move = function(x, y) {
+  this.x += x;
+  this.y += y;
+  this.x_speed = x;
+  this.y_speed = y;
+  if (this.x < 0) {
+    // all the way to the left
+    this.x = 0;
+    this.x_speed = 0;
+  } else if (this.x + this.width > 400) {
+    // all the way to the right
+    this.x = 400 - this.width;
+    this.x_speed = 0;
+  }
+}
 
 var player = new Player();
 var computer = new Computer();
 var ball = new Ball(200, 300);
 
 var render = function() {
-  context.fillStyle = "#FF00FF";
+  context.fillStyle = "#000000";
   context.fillRect(0, 0, width, height);
 
   player.render();
@@ -51,7 +101,7 @@ function Paddle(x, y, width, height) {
 }
 
 Paddle.prototype.render = function() {
-  context.fillStyle = "#0000FF";
+  context.fillStyle = "#FFFFFF";
   context.fillRect(this.x, this.y, this.width, this.height);
 }
 
@@ -82,7 +132,7 @@ function Ball(x, y) {
 Ball.prototype.render = function() {
   context.beginPath();
   context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
-  context.fillStyle = "#000000";
+  context.fillStyle = "#FFFFFF";
   context.fill();
 }
 
@@ -129,3 +179,14 @@ Ball.prototype.update = function(paddle1, paddle2) {
     }
   }
 };
+
+// controls
+var keysDown = {};
+
+window.addEventListener("keydown", function(event) {
+  keysDown[event.keyCode] = true;
+});
+
+window.addEventListener("keyup", function(event) {
+  delete keysDown[event.keyCode];
+})
