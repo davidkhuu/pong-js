@@ -27,6 +27,7 @@ function Paddle(x, y, width, height) {
   this.height = height;
   this.x_speed = 0;
   this.y_speed = 0;
+  this.score = 0;
 }
 
 Paddle.prototype.render = function(colour) {
@@ -85,13 +86,25 @@ Ball.prototype.update = function(paddle1, paddle2) {
   }
 
   // A point was score, reset the ball
-  if (this.x < 0 || this.x > GAME_WIDTH) {
+  if (this.x < 0){
     this.x_speed = 3;
     this.y_speed = 0;
     this.x = GAME_WIDTH/2;
     this.y = GAME_HEIGHT/2;
+    paddle2.score += 1;
     paddle1.y = MIDDLE_Y;
+
+    document.getElementById("p2Score").innerHTML = paddle2.score;
+  }
+  if(this.x > GAME_WIDTH) {
+    this.x_speed = 3;
+    this.y_speed = 0;
+    this.x = GAME_WIDTH/2;
+    this.y = GAME_HEIGHT/2;
+    paddle1.score += 1;
     paddle2.y = MIDDLE_Y;
+
+    document.getElementById("p1Score").innerHTML = paddle1.score;
   }
 
   if (top_x < 300) {
@@ -118,7 +131,7 @@ function Player() {
   this.paddle = new Paddle(10, MIDDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT);
 }
 
-Player.prototype.update = function() {
+Player.prototype.update = function() { 
   for (var key in keysDown) {
     var value = Number(key);
 
